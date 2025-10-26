@@ -88,68 +88,72 @@ class SqlRelationsApplicationTests {
 		assertNotNull(foundPatient);
 	}
 
-	@DisplayName("Surgery tablosu mevcut mu ? Doğru oluşturulmuş mu ?")
-	@Test
-	void findSurgeryTest(){
-		Patient patient = new Patient();
-		patient.setName("Test");
-		patient.setSurname("Test");
-		patient.setEmail("test@test.com");
-		patient.setComplaint("TEST");
-		Patient savedPatient = patientRepository.save(patient);
+    @DisplayName("Surgery tablosu mevcut mu ? Doğru oluşturulmuş mu ?")
+    @Test
+    void findSurgeryTest() {
+        Patient patient = new Patient();
+        patient.setName("Test");
+        patient.setSurname("Test");
+        patient.setEmail("test@test.com");
+        patient.setComplaint("TEST");
+        Patient savedPatient = patientRepository.save(patient);
 
-		Doctor doctor = new Doctor();
-		doctor.setName("Test");
-		doctor.setSurname("Test");
-		doctor.setProficiency("Cardiology");
-		Doctor savedDoctor = doctorRepository.save(doctor);
+        Doctor doctor = new Doctor();
+        doctor.setName("Test");
+        doctor.setSurname("Test");
+        doctor.setProficiency("Cardiology");
+        Doctor savedDoctor = doctorRepository.save(doctor);
 
-		Nurse nurse = new Nurse();
-		nurse.setName("Test");
-		nurse.setSurname("Test");
-		nurse.setProficiency("Cardiology");
-		nurseRepository.save(nurse);
+        Nurse nurse = new Nurse();
+        nurse.setName("Test");
+        nurse.setSurname("Test");
+        nurse.setProficiency("Cardiology");
+        Nurse savedNurse = nurseRepository.save(nurse);
 
-		Surgery surgery = new Surgery();
-		surgery.setPatientId(savedPatient.getId());
-		surgery.setNurseId(nurse.getId());
-		surgery.setDoctorId(savedDoctor.getId());
-		surgeryRepository.save(surgery);
+        Surgery surgery = new Surgery();
+        surgery.setPatient(savedPatient);
+        surgery.setDoctor(savedDoctor);
+        surgery.setNurse(savedNurse);
+        surgeryRepository.save(surgery);
 
-		List<Surgery> surgeryList = surgeryRepository.findAll();
-		Surgery foundSurgery = surgeryList.stream()
-				.filter(surgery1 -> surgery1.getDoctorId() == savedDoctor.getId())
-				.collect(Collectors.toList()).get(0);
+        List<Surgery> surgeryList = surgeryRepository.findAll();
+        Surgery foundSurgery = surgeryList.stream()
+                .filter(s -> s.getDoctor().getId() == savedDoctor.getId())
+                .findFirst()
+                .orElse(null);
 
-		assertNotNull(foundSurgery);
-	}
+        assertNotNull(foundSurgery);
+    }
 
-	@DisplayName("Operation tablosu mevcut mu ? Doğru oluşturulmuş mu ?")
-	@Test
-	void findOperationTest(){
-		Patient patient = new Patient();
-		patient.setName("Test");
-		patient.setSurname("Test");
-		patient.setEmail("test@test.com");
-		patient.setComplaint("TEST");
-		Patient savedPatient = patientRepository.save(patient);
 
-		Doctor doctor = new Doctor();
-		doctor.setName("Test");
-		doctor.setSurname("Test");
-		doctor.setProficiency("Cardiology");
-		Doctor savedDoctor = doctorRepository.save(doctor);
+    @DisplayName("Operation tablosu mevcut mu ? Doğru oluşturulmuş mu ?")
+    @Test
+    void findOperationTest() {
+        Patient patient = new Patient();
+        patient.setName("Test");
+        patient.setSurname("Test");
+        patient.setEmail("test@test.com");
+        patient.setComplaint("TEST");
+        Patient savedPatient = patientRepository.save(patient);
 
-		Operation operation = new Operation();
-		operation.setPatientId(savedPatient.getId());
-		operation.setDoctorId(savedDoctor.getId());
-		operationRepository.save(operation);
+        Doctor doctor = new Doctor();
+        doctor.setName("Test");
+        doctor.setSurname("Test");
+        doctor.setProficiency("Cardiology");
+        Doctor savedDoctor = doctorRepository.save(doctor);
 
-		List<Operation> operationList = operationRepository.findAll();
-		Operation foundOperation = operationList.stream()
-				.filter(operation1 -> operation1.getDoctorId() == 1)
-				.collect(Collectors.toList()).get(0);
+        Operation operation = new Operation();
+        operation.setPatient(savedPatient);
+        operation.setDoctor(savedDoctor);
+        operationRepository.save(operation);
 
-		assertNotNull(foundOperation);
-	}
+        List<Operation> operationList = operationRepository.findAll();
+        Operation foundOperation = operationList.stream()
+                .filter(op -> op.getDoctor().getId() == savedDoctor.getId())
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(foundOperation);
+    }
+
 }
